@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react";
+import "./App.css";
+import Searchbox from "./components/search-box/search-box.component";
+import Cardlist from "./components/card-list/card-list.component";
 
-function App() {
+const App = () => {
+  const [monsters, setmonsters] = useState([]);
+  const [searchfield, setsearchfield] = useState("");
+  const [filterdm, setfilteredm] = useState(monsters);
+
+  useEffect(() => {
+    fetch("https://jsonplaceholder.typicode.com/users")
+      .then((response) => response.json())
+      .then((users) => setmonsters(users));
+  }, []);
+
+  useEffect(() => {
+    const filteredmonsters = monsters.filter((monster) => {
+      return monster.name.toLowerCase().includes(searchfield);
+    });
+
+    setfilteredm(filteredmonsters);
+  }, [monsters, searchfield]);
+
+  const onsearchchange = (event) => {
+    const searchfieldstring = event.target.value.toLowerCase();
+    setsearchfield(searchfieldstring);
+  };
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <h2 className="title">Monsters Rolodex</h2>
+      <Searchbox onchange={onsearchchange} />
+      <Cardlist filterdmonsters={filterdm} />
     </div>
   );
-}
+};
 
 export default App;
